@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Audit extends Model
+{
+    //aa
+    protected $fillable = [
+        'vehicle_id',
+        'status',
+        'notes',
+        'audited_at',
+        'user_id',
+        'photo_path', // ← مهم إذا كنت ترسل صورة
+    ];
+    public function vehicle()
+{
+    return $this->belongsTo(Vehicle::class);
+}
+
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
+}
