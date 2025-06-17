@@ -10,30 +10,42 @@ class AuditController extends Controller
 {
     //aa
 
-    public function store(Request $request)
+public function store(Request $request)
 {
     $data = $request->validate([
         'vehicle_id' => 'required|exists:vehicles,id',
         'status' => 'required|string',
         'notes' => 'nullable|string',
         'audited_at' => 'required|date',
-        'photo' => 'nullable|image',
+        'photos.*' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
     ]);
-
-    if ($request->hasFile('photo')) {
-        $data['photo_path'] = $request->file('photo')->store('audit_photos', 'public');
-    }
 
     $data['user_id'] = $request->user()->id;
 
-    $audit = Audit::create($data);
+    $audit = Audit::create([
+        'vehicle_id' => $data['vehicle_id'],
+        'status' => $data['status'],
+        'notes' => $data['notes'] ?? null,
+        'audited_at' => $data['audited_at'],
+        'user_id' => $data['user_id'],
+    ]);
 
-    return response()->json($audit, 201);
+    if ($request->hasFile('photos')) {
+        foreach ($request->file('photos') as $photo) {
+            $path = $photo->store('audit_photos', 'public');
+            $audit->photos()->create([
+                'photo_path' => $path,
+            ]);
+        }
+    }
+
+    return response()->json($audit->load('photos'), 201);
 }
 
 public function history(Request $request)
 {
-    return Audit::with(['vehicle', 'user'])
+
+      return Audit::with(['vehicle', 'user', 'photos'])
         ->where('user_id', $request->user()->id)
         ->orderBy('audited_at', 'desc')
         ->get();

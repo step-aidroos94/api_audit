@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Audit extends Model
 {
     //aa
+    protected $casts = [
+    'photo_paths' => 'array',
+    'audited_at' => 'datetime',
+];
     protected $fillable = [
         'vehicle_id',
         'status',
@@ -25,4 +29,8 @@ public function user()
     return $this->belongsTo(User::class);
 }
 
+public function photos()
+{
+    return $this->hasMany(AuditPhoto::class);
+}
 }

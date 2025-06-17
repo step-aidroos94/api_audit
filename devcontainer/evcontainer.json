@@ -1,0 +1,20 @@
+{
+  "name": "Laravel with MySQL",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "forwardPorts": [8000, 3306],
+  "postCreateCommand": "composer install && php artisan key:generate",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/mysql:1": {
+      "version": "8.0",
+      "mysqlDatabase": "laravel_db",
+      "mysqlUser": "laravel_user",
+      "mysqlPassword": "password123"
+    }
+  },
+  "remoteUser": "vscode"
+}

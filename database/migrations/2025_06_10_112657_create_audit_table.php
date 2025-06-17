@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('status'); // good, needs_maintenance, etc.
             $table->text('notes')->nullable();
-            $table->string('photo_path')->nullable();
+            $table->json('photo_paths')->nullable(); 
             $table->timestamp('audited_at');
             $table->timestamps();
         });
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('audit');
+      Schema::dropIfExists('audits');
     }
 };

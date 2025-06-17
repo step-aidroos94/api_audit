@@ -20,6 +20,7 @@ class VehicleResource extends JsonResource
             'model' => $this->model,
             'brand' => $this->brand,
             'year' => $this->year,
+             'last_audit_status' => $this->latestAudit?->status,
         ];
     }
     
