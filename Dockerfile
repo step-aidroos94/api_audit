@@ -1,16 +1,18 @@
 FROM php:8.2-fpm
 
-# تثبيت أدوات النظام المطلوبة
+# تثبيت الأدوات المطلوبة
 RUN apt-get update && apt-get install -y \
+    nginx \
+    supervisor \
+    unzip \
+    git \
+    curl \
     libpng-dev \
     libjpeg-dev \
     libonig-dev \
     libxml2-dev \
-    zip \
-    unzip \
-    git \
-    curl \
     default-mysql-client \
+    php-mysql \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
 # تثبيت Composer
@@ -21,12 +23,17 @@ WORKDIR /var/www/html
 # نسخ ملفات المشروع
 COPY . .
 
-# تثبيت مكتبات PHP
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# تثبيت حزم Laravel
+RUN composer install --no-dev --optimize-autoloader
+
+# نسخ إعدادات Nginx و Supervisor
+COPY nginx.conf /etc/nginx/sites-available/default
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # تعيين صلاحيات للمجلدات
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache && \
+    chown -R www-data:www-data storage bootstrap/cache
 
-EXPOSE 9000
+EXPOSE 80
 
-CMD ["php-fpm"]
+CMD ["/usr/bin/supervisord"]
